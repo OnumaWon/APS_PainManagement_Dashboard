@@ -486,33 +486,56 @@ const CategoryPieChart = ({ data, categoryKey, showTable }: any) => {
 export const PayerPieChart = (props: any) => <CategoryPieChart {...props} categoryKey="payer" />;
 export const TraumaTypePieChart = (props: any) => <CategoryPieChart {...props} categoryKey="traumaType" />;
 const MedicationFrequencyChart = ({ data, type, showTable }: any) => {
-    const counts = useMemo(() => {
+    const { chartData } = useMemo(() => {
         const c: Record<string, number> = {};
+        let totalCount = 0;
         data.forEach((d: any) => {
             const list = d[type] || [];
             list.forEach((med: string) => {
-                // Simple cleanup if needed, though App.tsx already trims
                 const name = med.trim();
-                c[name] = (c[name] || 0) + 1;
+                // Count everything for the total
+                if (name) {
+                    c[name] = (c[name] || 0) + 1;
+                    totalCount++;
+                }
             });
         });
-        return Object.entries(c)
-            .map(([name, value]) => ({ name, value }))
+
+        const sorted = Object.entries(c)
+            .map(([name, value]) => ({
+                name,
+                value,
+                percent: totalCount > 0 ? ((value / totalCount) * 100).toFixed(1) : '0.0'
+            }))
             .sort((a, b) => b.value - a.value)
             .slice(0, 10); // Top 10
+
+        return { chartData: sorted };
     }, [data, type]);
 
-    if (showTable) return <SimpleTable data={counts} />;
+    if (showTable) return <SimpleTable data={chartData} columns={['name', 'value', 'percent']} />;
 
     return (
         <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={counts} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 80, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
                 <XAxis type="number" />
-                <YAxis dataKey="name" type="category" width={230} tick={{ fontSize: 10 }} />
-                <Tooltip />
+                <YAxis dataKey="name" type="category" width={350} tick={{ fontSize: 10 }} interval={0} />
+                <Tooltip formatter={(value, name, props) => [`${value} (${props.payload.percent}%)`, 'Count']} />
                 <Bar dataKey="value" fill="#8884d8" radius={[0, 4, 4, 0]}>
-                    {counts.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                    <LabelList
+                        dataKey="value"
+                        position="right"
+                        content={(props: any) => {
+                            const { x, y, width, height, value, payload } = props;
+                            return (
+                                <text x={x + width + 5} y={y + height / 2} fill="#666" fontSize="11px" textAnchor="start" dominantBaseline="middle">
+                                    {`${value} (${payload.percent}%)`}
+                                </text>
+                            );
+                        }}
+                    />
+                    {chartData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Bar>
             </BarChart>
         </ResponsiveContainer>

@@ -161,7 +161,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ rawData, year, month, acti
               <ChartCard title="Post-Op Management Trends"><PostOpMgmtTrendChart data={yearData} /></ChartCard>
             </div>
             <h3 className="text-xl font-semibold text-slate-800 dark:text-white mt-4">Medication Details (Top 10)</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-6">
               <ChartCard title="Opioids (Col AB)"><OpioidFrequencyChart data={filteredData} /></ChartCard>
               <ChartCard title="Non-Opioids (Col AC)"><NonOpioidFrequencyChart data={filteredData} /></ChartCard>
               <ChartCard title="Adjuvants (Col AD)"><AdjuvantFrequencyChart data={filteredData} /></ChartCard>
