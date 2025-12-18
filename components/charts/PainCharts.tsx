@@ -492,9 +492,19 @@ const MedicationFrequencyChart = ({ data, type, showTable }: any) => {
         data.forEach((d: any) => {
             const list = d[type] || [];
             list.forEach((med: string) => {
-                const name = med.trim();
-                // Count everything for the total
+                let name = med.trim();
                 if (name) {
+                    // Clean: Split by space/dot, take first word, Title Case
+                    const parts = name.split(/[\s.]+/);
+                    if (parts.length > 0) {
+                        let drug = parts[0].toLowerCase();
+                        // Handle parenthesis start e.g. (Drug)
+                        drug = drug.replace(/^[(\[]+/, '');
+                        if (drug.length > 0) {
+                            drug = drug.charAt(0).toUpperCase() + drug.slice(1);
+                            name = drug;
+                        }
+                    }
                     c[name] = (c[name] || 0) + 1;
                     totalCount++;
                 }
