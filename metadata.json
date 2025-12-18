@@ -1,0 +1,8 @@
+{
+  "name": "APS Pain Management Dashboard",
+  "description": "A comprehensive data dashboard for pain management analytics, featuring interactive charts, Excel data upload, and advanced Gemini AI capabilities for analysis and automation.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
