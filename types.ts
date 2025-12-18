@@ -71,7 +71,7 @@ export enum AdverseEventType {
   Pruritus = 'Pruritus',
   UrinaryRetention = 'Urinary Retention',
   Dizziness = 'Dizziness',
-  
+
   // Severe / Intervention Complications
   Hypotension = 'Hypotension (Severe)',
   RespiratoryDepression = 'Resp. Depression',
@@ -80,7 +80,7 @@ export enum AdverseEventType {
   Infection = 'Infection',
   DuralPuncture = 'Dural Puncture',
   MotorBlock = 'Prolonged Motor Block',
-  
+
   // Additional Severe Complications
   CatheterMigration = 'Catheter Migration',
   LAST = 'LAST (Toxicity)',
@@ -138,7 +138,13 @@ export interface CaseData {
   complications: boolean;
   adverseEvents: AdverseEventType[]; // New field for specific events
   qualityIndicators: QualityIndicators;
-  
+
+  // Medication Details (Columns AB-AE)
+  drugGroupCategory: string; // Column AE (e.g., "Opioid", "Multimodal Drug")
+  opioids: string[];        // Column AB
+  nonOpioids: string[];     // Column AC
+  adjuvants: string[];      // Column AD
+
   // Patient Experience & PROMs
   satisfactionScore: number; // 1-5 Scale (5 is Very Satisfied)
   promsImprovement: number; // Percentage improvement in function/QoL (e.g., 20%)

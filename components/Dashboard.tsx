@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
-import { 
-  Users, Activity, AlertTriangle, TrendingDown, 
+import {
+  Users, Activity, AlertTriangle, TrendingDown,
   Table as TableIcon, BarChart2
 } from 'lucide-react';
 import { Card } from './ui/Card';
@@ -20,7 +20,8 @@ import {
   SafetyTrendChart, SafetyDistributionChart, GeneralSideEffectsTrendChart, SevereComplicationsTrendChart,
   GenderPainChart, OpTypePainStatusChart, DrugGroupPainScoresChart, PatientTypeBarChart, DrugGroupMonthlyBarChart,
   SpecialtyMonthlyBarChart, SpecificMedicationChart, InteractiveOpTypePainTrendChart,
-  SeverePainRest24Chart, SeverePainMovement24Chart, SeverePainRest72Chart, SeverePainMovement72Chart
+  SeverePainRest24Chart, SeverePainMovement24Chart, SeverePainRest72Chart, SeverePainMovement72Chart,
+  OpioidFrequencyChart, NonOpioidFrequencyChart, AdjuvantFrequencyChart
 } from './charts/PainCharts';
 
 interface DashboardProps {
@@ -33,14 +34,14 @@ interface DashboardProps {
 
 const ChartCard = ({ title, subtitle, children, className }: any) => {
   const [view, setView] = useState<'chart' | 'table'>('chart');
-  
+
   return (
-    <Card 
-      title={title} 
-      subtitle={subtitle} 
+    <Card
+      title={title}
+      subtitle={subtitle}
       className={className}
       action={
-        <button 
+        <button
           onClick={() => setView(view === 'chart' ? 'table' : 'chart')}
           className="p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition-colors border border-slate-200 dark:border-slate-600 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-tight"
         >
@@ -121,22 +122,22 @@ export const Dashboard: React.FC<DashboardProps> = ({ rawData, year, month, acti
               </div>
               <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
                 <div className="flex justify-between items-start text-slate-800 dark:text-slate-100">
-                   <div><p className="text-sm font-medium text-slate-500 dark:text-slate-400">Pain Reduction &gt;50%</p><h3 className="text-2xl font-bold mt-1">{successRate}%</h3></div>
-                   <div className="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg"><TrendingDown size={20} /></div>
+                  <div><p className="text-sm font-medium text-slate-500 dark:text-slate-400">Pain Reduction &gt;50%</p><h3 className="text-2xl font-bold mt-1">{successRate}%</h3></div>
+                  <div className="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg"><TrendingDown size={20} /></div>
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-               <ChartCard title="Operation Type Distribution"><OperationTypeChart data={filteredData} onDataClick={handleChartClick} /></ChartCard>
-               <ChartCard title="Ortho Type Distribution"><OrthoTypePieChart data={filteredData} onDataClick={handleChartClick} /></ChartCard>
-               <ChartCard title="Pain Trends (Rest)" subtitle="Avg (Ignoring Empty Cells)"><PainTrendChart data={yearData} type="rest" /></ChartCard>
-               <ChartCard title="Pain Trends (On Movement)" subtitle="Avg (Ignoring Empty Cells)"><PainTrendChart data={yearData} type="movement" /></ChartCard>
-               <ChartCard title="Pain Reduction Effectiveness" className="lg:col-span-2"><PainReductionChart data={yearData} /></ChartCard>
+              <ChartCard title="Operation Type Distribution"><OperationTypeChart data={filteredData} onDataClick={handleChartClick} /></ChartCard>
+              <ChartCard title="Ortho Type Distribution"><OrthoTypePieChart data={filteredData} onDataClick={handleChartClick} /></ChartCard>
+              <ChartCard title="Pain Trends (Rest)" subtitle="Avg (Ignoring Empty Cells)"><PainTrendChart data={yearData} type="rest" /></ChartCard>
+              <ChartCard title="Pain Trends (On Movement)" subtitle="Avg (Ignoring Empty Cells)"><PainTrendChart data={yearData} type="movement" /></ChartCard>
+              <ChartCard title="Pain Reduction Effectiveness" className="lg:col-span-2"><PainReductionChart data={yearData} /></ChartCard>
             </div>
           </div>
         );
-      
+
       case 'patient-profile':
         return (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -146,28 +147,47 @@ export const Dashboard: React.FC<DashboardProps> = ({ rawData, year, month, acti
             <ChartCard title="Nationality Breakdown"><NationalityPieChart data={filteredData} /></ChartCard>
             <ChartCard title="Payer Type Distribution"><PayerPieChart data={filteredData} /></ChartCard>
             <ChartCard title="Specialty Distribution"><SpecialtyPieChart data={filteredData} /></ChartCard>
+            <ChartCard title="Specialty Trends"><SpecialtyTrendChart data={yearData} /></ChartCard>
+            <ChartCard title="Trauma Type Distribution"><TraumaTypePieChart data={filteredData} /></ChartCard>
+            <ChartCard title="Trauma Type Trends"><TraumaTypeTrendChart data={yearData} /></ChartCard>
+          </div>
+        );
+
+      case 'pain-management':
+        return (
+          <div className="flex flex-col gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ChartCard title="Post-Op Pain Management Methods"><PostOpMgmtPieChart data={filteredData} /></ChartCard>
+              <ChartCard title="Post-Op Management Trends"><PostOpMgmtTrendChart data={yearData} /></ChartCard>
+            </div>
+            <h3 className="text-xl font-semibold text-slate-800 dark:text-white mt-4">Medication Details (Top 10)</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <ChartCard title="Opioids (Col AB)"><OpioidFrequencyChart data={filteredData} /></ChartCard>
+              <ChartCard title="Non-Opioids (Col AC)"><NonOpioidFrequencyChart data={filteredData} /></ChartCard>
+              <ChartCard title="Adjuvants (Col AD)"><AdjuvantFrequencyChart data={filteredData} /></ChartCard>
+            </div>
           </div>
         );
 
       case 'pain-assessment':
         return (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-             <ChartCard title="Pain Trends (Rest) - Detailed"><InteractiveOpTypePainTrendChart data={yearData} type="rest" /></ChartCard>
-             <ChartCard title="Pain Trends (Movement) - Detailed"><InteractiveOpTypePainTrendChart data={yearData} type="movement" /></ChartCard>
-             <ChartCard title="Pain at Discharge (Trend)"><PainDischargeTrendChart data={yearData} /></ChartCard>
-             <ChartCard title="Age vs Initial Pain"><AgePainScatterChart data={filteredData} /></ChartCard>
-             <ChartCard title="Pain Recovery Analysis"><PainRecoveryScatterChart data={filteredData} /></ChartCard>
+            <ChartCard title="Pain Trends (Rest) - Detailed"><InteractiveOpTypePainTrendChart data={yearData} type="rest" /></ChartCard>
+            <ChartCard title="Pain Trends (Movement) - Detailed"><InteractiveOpTypePainTrendChart data={yearData} type="movement" /></ChartCard>
+            <ChartCard title="Pain at Discharge (Trend)"><PainDischargeTrendChart data={yearData} /></ChartCard>
+            <ChartCard title="Age vs Initial Pain"><AgePainScatterChart data={filteredData} /></ChartCard>
+            <ChartCard title="Pain Recovery Analysis"><PainRecoveryScatterChart data={filteredData} /></ChartCard>
           </div>
         );
 
       case 'medication':
         return (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <ChartCard title="Specific Medication Distribution"><SpecificMedicationChart data={filteredData} /></ChartCard>
-                <ChartCard title="Drug Group Utilization"><DrugGroupMonthlyBarChart data={yearData} /></ChartCard>
-                <ChartCard title="Drug Group Summary"><DrugGroupSummaryChart data={filteredData} /></ChartCard>
-                <ChartCard title="Pain Outcomes by Medication Group" className="lg:col-span-2"><DrugGroupPainScoresChart data={filteredData} /></ChartCard>
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ChartCard title="Specific Medication Distribution"><SpecificMedicationChart data={filteredData} /></ChartCard>
+            <ChartCard title="Drug Group Utilization"><DrugGroupMonthlyBarChart data={yearData} /></ChartCard>
+            <ChartCard title="Drug Group Summary"><DrugGroupSummaryChart data={filteredData} /></ChartCard>
+            <ChartCard title="Pain Outcomes by Medication Group" className="lg:col-span-2"><DrugGroupPainScoresChart data={filteredData} /></ChartCard>
+          </div>
         );
 
       case 'effectiveness':
@@ -182,22 +202,22 @@ export const Dashboard: React.FC<DashboardProps> = ({ rawData, year, month, acti
 
       case 'safety':
         return (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <ChartCard title="General Side Effects"><SafetyDistributionChart data={filteredData} category="general" /></ChartCard>
-                <ChartCard title="General Trends"><GeneralSideEffectsTrendChart data={yearData} /></ChartCard>
-                <ChartCard title="Severe Complications"><SafetyDistributionChart data={filteredData} category="severe" /></ChartCard>
-                <ChartCard title="Severe Trends"><SevereComplicationsTrendChart data={yearData} /></ChartCard>
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ChartCard title="General Side Effects"><SafetyDistributionChart data={filteredData} category="general" /></ChartCard>
+            <ChartCard title="General Trends"><GeneralSideEffectsTrendChart data={yearData} /></ChartCard>
+            <ChartCard title="Severe Complications"><SafetyDistributionChart data={filteredData} category="severe" /></ChartCard>
+            <ChartCard title="Severe Trends"><SevereComplicationsTrendChart data={yearData} /></ChartCard>
+          </div>
         );
 
       case 'experience':
         return (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <ChartCard title="Patient Satisfaction Distribution"><SatisfactionChart data={filteredData} /></ChartCard>
-                <ChartCard title="Satisfaction Trends"><SatisfactionTrendChart data={yearData} /></ChartCard>
-                <ChartCard title="Patient-Reported Outcomes (PROMs)"><PromsTrendChart data={yearData} /></ChartCard>
-                <ChartCard title="Pain Interference with ADL"><PainInterferenceChart data={filteredData} /></ChartCard>
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ChartCard title="Patient Satisfaction Distribution"><SatisfactionChart data={filteredData} /></ChartCard>
+            <ChartCard title="Satisfaction Trends"><SatisfactionTrendChart data={yearData} /></ChartCard>
+            <ChartCard title="Patient-Reported Outcomes (PROMs)"><PromsTrendChart data={yearData} /></ChartCard>
+            <ChartCard title="Pain Interference with ADL"><PainInterferenceChart data={filteredData} /></ChartCard>
+          </div>
         );
 
       case 'detailed-records':
